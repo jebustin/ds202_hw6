@@ -29,7 +29,13 @@ bestInShowFull <- bestInShowFull %>%
   mutate('size category' = as.factor(bestInShowFull$'size category')) %>%
   mutate('intelligence category' = as.factor(bestInShowFull$'intelligence category')) %>%
   mutate(Intelligence = if_else(bestInShowFull$'intelligence category' == 'Lowest', 'Dumb', 'Clever')) %>%
-  mutate(Intelligence = if_else(bestInShowFull$'intelligence category' == 'Fair', 'Dumb', 'Clever'))
+  mutate(Intelligence = if_else(bestInShowFull$'intelligence category' == 'Fair', 'Dumb', 'Clever')) 
+
+bestInShowFull$'size category' <- factor(bestInShowFull$'size category', levels = c("small", "medium", "large"))
+
+bestInShowFull$'Intelligence' <- as.factor(bestInShowFull$'Intelligence')
+
+bestInShowFull$'Intelligence' <- factor(bestInShowFull$'Intelligence', levels = c('Dumb', 'Clever'))
 
 bestInShowFull <- left_join(bestInShowFull, bestInShow, by = 'Dog Breed')
 
@@ -47,16 +53,19 @@ bestInShowFull <- left_join(bestInShowFull, bestInShow, by = 'Dog Breed')
 
 ```{r}
 plot <- bestInShowFull %>%
-  ggplot(aes(x = bestInShowFull$'datadog score', y = bestInShowFull$"Popular_Ranking", color = category, text = paste0("<b>Breed: </b>", bestInShowFull$'Dog Breed', "<br>", "<b>Size: </b>", bestInShowFull$'size category'))) +
-  geom_point(aes(shape = bestInShowFull$'Intelligence')) +
+  ggplot(aes(x = bestInShowFull$'datadog score', y = bestInShowFull$"Popular_Ranking", color = category, text = paste0("<b>Breed: </b>", bestInShowFull$'Dog Breed', "<br>", "<b>Size: </b>", bestInShowFull$'size category', "<br>", "<b>Category(Color): <b>", bestInShowFull$'category', "<br>", "<b>Intelligence(Shape): <b>", bestInShowFull$'Intelligence'))) +
+  geom_point(aes(shape = bestInShowFull$'Intelligence'), size = bestInShowFull$'size category') +
   ##geom_text(aes(size = bestInShowFull$'size category', label = bestInShowFull$'Dog Breed'), nudge_y = -3) +
   scale_radius(range = c(2,3))+
   scale_y_reverse() +
   ggtitle("Replication of The Ultimate Data Dog") +
   xlab("Data Dog Score") +
-  ylab("Popularity")
+  ylab("Popularity") +
+  scale_colour_brewer(palette = "Set1")
 
-ggplotly(plot, tooltip = "text")
+plot1 <- ggplotly(plot, tooltip = "text")
+
+hide_legend(plot1)
 
 ```
 
